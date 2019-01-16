@@ -1,3 +1,7 @@
+## 2.4.4 - 2019-01-19
+### Updated
+- Photos, Collections and CuratedCollection returning PageResult
+
 ## 2.4.3 - 2018-03-30
 ### Added
 - Relax dependency for guzzle to include 6.3.x (https://github.com/unsplash/unsplash-php/pull/88)

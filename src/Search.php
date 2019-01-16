@@ -10,84 +10,57 @@ class Search extends Endpoint
 {
     /**
      * Retrieve a single page of photo results depending on search results
-     * Returns ArrayObject that contain PageResult object.
      *
-     * @param  string  $search       Search terms.
-     * @param  integer $page         Page number to retrieve. (Optional; default: 1)
-     * @param  integer $per_page     Number of items per page. (Optional; default: 10)
-     * @param  string  $orientation  Filter search results by photo orientation. Valid values are landscape,
-     *                               portrait, and squarish. (Optional)
-     * @param  string  $collections  Collection ID(‘s) to narrow search. If multiple, comma-separated. (Optional)
+     * @param  array $filters Filters.
+     *
      * @return PageResult
      */
-    public static function photos($search, $page = 1, $per_page = 10, $orientation = null, $collections = null)
+    public static function photos($filters = [])
     {
-        $query = [
-            'query' => $search,
-            'page' => $page,
-            'per_page' => $per_page
-        ];
+        $photos = self::get("/search/photos", ['query' => $filters]);
 
-        if ( ! empty($orientation)) {
-            $query['orientation'] = $orientation;
-        }
+        return self::getPageResult($photos->getBody(), $photos->getHeaders(), Photo::class);
+    }
 
-        if ( ! empty($collections)) {
-            $query['collections'] = $collections;
-        }
-
-        $photos = self::get(
-            "/search/photos",
-            [ 'query' => $query ]
-        );
+    /**
+     * Retrieve a single page of photo results depending on search results
+     * Returns ArrayObject that contain PageResult object.
+     *
+     * @param  array $filters Filters.
+     *
+     * @return PageResult
+     */
+    public static function random($filters = [])
+    {
+        $photos = self::get("/photos/random", ['query' => $filters]);
 
         return self::getPageResult($photos->getBody(), $photos->getHeaders(), Photo::class);
     }
 
     /**
      * Retrieve a single page of collection results depending on search results
-     * Returns ArrayObject that contain PageResult object.
      *
-     * @param  string  $search   Search terms.
-     * @param  integer $page     Page from which the photos need to be retrieve
-     * @param  integer $per_page Number of element in a page
+     * @param  array $filters Filters.
+     *
      * @return PageResult
      */
-    public static function collections($search, $page = 1, $per_page = 10)
+    public static function collections($filters = [])
     {
-        $collections = self::get(
-            "/search/collections",
-            ['query' => [
-                    'query' => $search,
-                    'page' => $page,
-                    'per_page' => $per_page
-                ]
-            ]
-        );
+        $collections = self::get("/search/collections", ['query' => $filters]);
 
         return self::getPageResult($collections->getBody(), $collections->getHeaders(), Collection::class);
     }
 
     /**
      * Retrieve a single page of user results depending on search results
-     * Returns ArrayObject that contain PageResult object.
      *
-     * @param  string  $search   Search terms.
-     * @param  integer $page     Page from which the photos need to be retrieve
-     * @param  integer $per_page Number of element in a page
+     * @param  array $filters Filters.
+     *
      * @return PageResult
      */
-    public static function users($search, $page = 1, $per_page = 10)
+    public static function users($filters = [])
     {
-        $users = self::get(
-            "/search/users",
-            ['query' => [
-                    'query' => $search,
-                    'page' => $page,
-                    'per_page' => $per_page
-                ]
-            ]
-        );
+        $users = self::get("/search/users", ['query' => $filters]);
 
         return self::getPageResult($users->getBody(), $users->getHeaders(), User::class);
     }

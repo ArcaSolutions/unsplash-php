@@ -11,6 +11,18 @@ namespace Crew\Unsplash;
 class Photo extends Endpoint
 {
     private $photographer;
+    private $parameters;
+
+    public function __construct(array $parameters = [])
+    {
+        parent::__construct($parameters);
+        $this->parameters = $parameters;
+    }
+
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
 
     /**
      * Retrieve the a photo object from the ID specified
@@ -27,71 +39,67 @@ class Photo extends Endpoint
 
     /**
      * Retrieve all the photos on a specific page.
-     * Returns an ArrayObject that contains Photo objects.
      *
-     * @param  integer $page Page from which the photos need to be retrieve
-     * @param  integer $per_page Number of element in a page
-     * @param string $order_by Order in which to retrieve photos
-     * @return ArrayObject of Photos
+     * @param  array $filters Filters.
+     *
+     * @return ArrayObject|PageResult of Photos
      */
-    public static function all($page = 1, $per_page = 10, $order_by = 'latest')
+    public static function all($filters = [], $returnArrayObject = false)
     {
-        $photos = self::get("/photos", [
-            'query' => ['page' => $page, 'per_page' => $per_page, 'order_by' => $order_by]
-        ]);
+        $photos = self::get("/photos", ['query' => $filters]);
 
-        $photosArray = self::getArray($photos->getBody(), get_called_class());
+        $photosArray = self::getArray($photos->getBody(), Photo::class);
+        $arrayObjects = new ArrayObject($photosArray, $photos->getHeaders());
+        if ($returnArrayObject) {
+            return $arrayObjects;
+        }
+        $pageResults['results'] = [];
+        foreach ($photosArray as $photo) {
+            $pageResults['results'][] = $photo->getParameters();
+        }
+        $pageResults['total_pages'] = $arrayObjects->totalPages();
+        $pageResults['total'] = $arrayObjects->count();
 
-        return new ArrayObject($photosArray, $photos->getHeaders());
+        return self::getPageResult(json_encode($pageResults), $photos->getHeaders(), Photo::class);
     }
 
 
     /**
      * Retrieve a single page from the list of the curated photos (front-page’s photos).
-     * Returns an ArrayObject that contains Photo objects.
      *
-     * @param  integer $page Page from which the photos need to be retrieve
-     * @param  integer $per_page Number of element in a page
-     * @param string $order_by Order in which to retrieve photos
-     * @return ArrayObject of Photos
+     * @param  array $filters Filters.
+     *
+     * @return ArrayObject|PageResult of Photos
      */
-    public static function curated($page = 1, $per_page = 10, $order_by = 'latest')
+    public static function curated($filters = [], $returnArrayObject = false)
     {
-        $photos = self::get("/photos/curated", [
-            'query' => ['page' => $page, 'per_page' => $per_page, 'order_by' => $order_by]
-        ]);
+        $photos = self::get("/photos/curated", ['query' => $filters]);
 
         $photosArray = self::getArray($photos->getBody(), get_called_class());
+        $arrayObjects = new ArrayObject($photosArray, $photos->getHeaders());
+        if ($returnArrayObject) {
+            return $arrayObjects;
+        }
+        $pageResults['results'] = [];
+        foreach ($photosArray as $photo) {
+            $pageResults['results'][] = $photo->getParameters();
+        }
+        $pageResults['total_pages'] = $arrayObjects->totalPages();
+        $pageResults['total'] = $arrayObjects->count();
 
-        return new ArrayObject($photosArray, $photos->getHeaders());
+        return self::getPageResult(json_encode($pageResults), $photos->getHeaders(), Photo::class);
     }
 
     /**
      * Retrieve all the photos on a specific page depending on search results
-     * Returns ArrayObject that contain Photo object.
      *
-     * @param string $search Retrieve photos matching the search term.
-     * @param integer $category Retrieve photos matching the category ID
-     * @param integer $page Page from which the photos need to be retrieved
-     * @param integer $per_page Number of elements on a page
-     * @param string|null $orientation Orientation to search for
-     * @deprecated
-     * @see Search::photos()
+     * @param  array $filters Filters.
+     *
      * @return ArrayObject of Photos
      */
-    public static function search($search, $category = null, $page = 1, $per_page = 10, $orientation = null)
+    public static function search($filters = [])
     {
-        $photos = self::get(
-            "/photos/search",
-            ['query' => [
-                'query' => $search,
-                'category' => $category,
-                'orientation' => $orientation,
-                'page' => $page,
-                'per_page' => $per_page
-                ]
-            ]
-        );
+        $photos = self::get("/photos/search", ['query' => $filters]);
 
         $photosArray = self::getArray($photos->getBody(), get_called_class());
 
@@ -134,7 +142,7 @@ class Photo extends Endpoint
      */
     public function photographer()
     {
-        if (! isset($this->photographer)) {
+        if (!isset($this->photographer)) {
             $this->photographer = User::find($this->user['username']);
         }
 
@@ -149,13 +157,9 @@ class Photo extends Endpoint
      */
     public static function random($filters = [])
     {
-        if (isset($filters['category']) && is_array($filters['category'])) {
-            $filters['category'] = implode(',', $filters['category']);
-        }
-
         $filters['featured'] = (isset($filters['featured']) && $filters['featured']) ? 'true' : null;
 
-        $photo = json_decode(self::get("photos/random", ['query' => $filters])->getBody(), true);
+        $photo = json_decode(self::get('photos/random', ['query' => $filters])->getBody(), true);
 
         return new self($photo);
     }

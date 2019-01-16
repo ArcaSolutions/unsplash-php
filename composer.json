@@ -1,6 +1,6 @@
 {
-  "name": "unsplash/unsplash",
-  "description": "Wrapper to access the Unsplash API and photo library",
+  "name": "arcasolutions/unsplash",
+  "description": "Wrapper to access the Unsplash API and photo library by Arca Solutions",
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
@@ -19,6 +19,10 @@
     {
       "name": "Hugh Downer",
       "email": "hugh.downer@gmail.com"
+    },
+    {
+      "name": "João Pedro Schias",
+      "email": "joao.schias@arcasolutions.com"
     }
   ],
   "require": {
