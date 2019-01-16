@@ -38,17 +38,14 @@ class CuratedCollection extends Endpoint
     /**
      * Retrieve all curated batches for a given page
      *
-     * @param  integer $page Page from which the curated batches need to be retrieved
-     * @param  integer $per_page Number of elements on a page
+     * @param  array $filters Filters.
+     *
      * @param bool $returnArrayObject Does function should return collections as ArrayObject (backward compatibility)
      * @return ArrayObject|PageResult of CuratedBatch
      */
-    public static function all($page = 1, $per_page = 10, $returnArrayObject = true)
+    public static function all($filters = [], $returnArrayObject = true)
     {
-        $curatedBatches = self::get(
-            "/collections/curated",
-            ['query' => ['page' => $page, 'per_page' => $per_page]]
-        );
+        $curatedBatches = self::get("/collections/curated", ['query' => $filters]);
 
         $curatedBatchesArray = self::getArray($curatedBatches->getBody(), get_called_class());
         $arrayObjects = new ArrayObject($curatedBatchesArray, $curatedBatches->getHeaders());

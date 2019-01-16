@@ -25,17 +25,14 @@ class Collection extends Endpoint
     /**
      * Retrieve all collections for a given page
      *
-     * @param  integer $page     Page from which the collections need to be retrieved
-     * @param  integer $per_page Number of elements on a page
+     * @param  array $filters Filters.
      * @param bool $returnArrayObject Does function should return collections as ArrayObject (backward compatibility)
+     *
      * @return ArrayObject|PageResult of Collections
      */
-    public static function all($page = 1, $per_page = 10, $returnArrayObject = true)
+    public static function all($filters = [], $returnArrayObject = true)
     {
-        $collections = self::get(
-            "/collections",
-            ['query' => ['page' => $page, 'per_page' => $per_page]]
-        );
+        $collections = self::get("/collections", ['query' => $filters]);
 
         $collectionsArray = self::getArray($collections->getBody(), get_called_class());
         $arrayObjects = new ArrayObject($collectionsArray, $collections->getHeaders());
@@ -69,34 +66,34 @@ class Collection extends Endpoint
      * Retrieve all the photos for a specific collection
      * Returns an ArrayObject that contains Photo objects.
      *
-     * @param  integer $page     Page from which the collections need to be retrieved
-     * @param  integer $per_page Number of elements on a page
+     * @param  array $filters Filters.
      * @param bool $returnArrayObject Does function should return photos as ArrayObject (backward compatibility)
+     *
      * @return ArrayObject of Photo
      */
-    public function photos($page = 1, $per_page = 10, $returnArrayObject = true)
+    public function photos($filters = [], $returnArrayObject = true)
     {
-        if (! isset($this->photos["{$page}-{$per_page}"])) {
+        if (! isset($this->photos["{$filters['page']}-{$filters['per_page']}"])) {
             $photos = self::get(
                 "/collections/{$this->id}/photos",
-                ['query' => ['page' => $page, 'per_page' => $per_page]]
+                ['query' => ['page' => $filters['page'], 'per_page' => $filters['per_page']]]
             );
 
-            $this->photos["{$page}-{$per_page}"] = [
+            $this->photos["{$filters['page']}-{$filters['per_page']}"] = [
                 'body' => self::getArray($photos->getBody(), __NAMESPACE__.'\\Photo'),
                 'headers' => $photos->getHeaders()
             ];
         }
         $arrayObjects = new ArrayObject(
-            $this->photos["{$page}-{$per_page}"]['body'],
-            $this->photos["{$page}-{$per_page}"]['headers']
+            $this->photos["{$filters['page']}-{$filters['per_page']}"]['body'],
+            $this->photos["{$filters['page']}-{$filters['per_page']}"]['headers']
         );
         if($returnArrayObject) {
             return $arrayObjects;
         }
 
         $pageResults['results'] = [];
-        foreach($this->photos["{$page}-{$per_page}"] as $photos2){
+        foreach($this->photos["{$filters['page']}-{$filters['per_page']}"] as $photos2){
             foreach($photos2 as $photo) {
                 if(is_array($photo)){
                     $photo = new Photo($photo);
@@ -203,14 +200,15 @@ class Collection extends Endpoint
 
     /**
      * Get a page of  featured collections
-     * @param int $page - page to retrieve
-     * @param int $per_page - num per page
+     *
+     * @param  array $filters Filters.
      * @param bool $returnArrayObject Does function should return collections as ArrayObject (backward compatibility)
+     *
      * @return ArrayObject|PageResult
      */
-    public static function featured($page = 1, $per_page = 10, $returnArrayObject = true)
+    public static function featured($filters = [], $returnArrayObject = true)
     {
-        $collections = self::get("/collections/featured", ['query' => ['page' => $page, 'per_page' => $per_page]]);
+        $collections = self::get("/collections/featured", ['query' => $filters]);
         $collectionsArray = self::getArray($collections->getBody(), get_called_class());
         $arrayObjects = new ArrayObject($collectionsArray, $collections->getHeaders());
         if($returnArrayObject) {

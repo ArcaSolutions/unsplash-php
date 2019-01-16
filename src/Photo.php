@@ -44,7 +44,7 @@ class Photo extends Endpoint
      *
      * @return ArrayObject|PageResult of Photos
      */
-    public static function all($filters = [], $returnArrayObject = false)
+    public static function all($filters = [], $returnArrayObject = true)
     {
         $photos = self::get("/photos", ['query' => $filters]);
 
@@ -71,7 +71,7 @@ class Photo extends Endpoint
      *
      * @return ArrayObject|PageResult of Photos
      */
-    public static function curated($filters = [], $returnArrayObject = false)
+    public static function curated($filters = [], $returnArrayObject = true)
     {
         $photos = self::get("/photos/curated", ['query' => $filters]);
 

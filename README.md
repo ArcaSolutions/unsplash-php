@@ -21,7 +21,7 @@ Quick links to methods you're likely to care about:
 `unsplash-php` uses [Composer](https://getcomposer.org/). To use it, require the library
 
 ```
-composer require unsplash/unsplash
+composer require arcasolutions/unsplash
 ```
 
 ## Usage
@@ -85,8 +85,7 @@ Some parameters are identical across all methods:
 
   param              | Description
 ---------------------|-----------------------------------------------------
-`$per_page`          | Defines the number of objects per page. *Default 10*
-`$page`              | Defines the offset page. *Default 1*
+`$filters`          |Filters used by the API
 `$returnArrayObject` | Defines if method should return ArrayObject. *Default true*
 
 *Note: The methods that return multiple objects return an `ArrayObject`, which acts like a normal stdClass.*
@@ -101,7 +100,7 @@ Some parameters are identical across all methods:
 
 <div id="search-photos" />
 
-#### Crew\Unsplash\Search::photos($search, $page, $per_page, $orientation, $collections)
+#### Crew\Unsplash\Search::photos($filters)
 
 Retrieve a single page of photo results depending on search results.
 
@@ -109,27 +108,25 @@ Retrieve a single page of photo results depending on search results.
 
   Argument     | Type   | Opt/Required
 ---------------|--------|--------------
-`$search`      | string | Required
-`$page`        | int    | Opt *(Default: 1)*
-`$per_page`    | int    | Opt *(Default: 10 / Maximum: 30)*
-`$orientation` | string | Opt *(Default: null / Available: "landscape", "portrait", "squarish")*
-`$collections` | string | Opt *(Default: null / If multiple, comma-separated)*
+`$filters`      | array | Required
 
 **Example**
 
 
 ```php
-$search = 'forest';
-$page = 3;
-$per_page = 15;
-$orientation = 'landscape';
+$filters  = [
+    'query' => 'Some query',
+    'page' => 3,
+    'per_page' => 15,
+    'orientation' => 'landscape'
+];
 
-Crew\Unsplash\Search::photos($search, $page, $per_page, $orientation);
+Crew\Unsplash\Search::photos($filters);
 ```
 
 ----
 
-#### Crew\Unsplash\Search::collections($search, $page, $per_page)
+#### Crew\Unsplash\Search::collections($filters)
 
 Retrieve a single page of collection results depending on search results.
 
@@ -137,15 +134,19 @@ Retrieve a single page of collection results depending on search results.
 
   Argument     | Type   | Opt/Required
 ---------------|--------|--------------
-`$search`      | string | Required
-`$per_page`    | int    | Opt *(Default: 10 / Maximum: 30)*
-`$page`        | int    | Opt *(Default: 1)*
+`$filters`      | array | Required
 
 **Example**
 
 
 ```php
-Crew\Unsplash\Search::collections($search, $page, $per_page);
+$filters  = [
+    'query' => 'Some query',
+    'page' => 3,
+    'per_page' => 15,
+];
+
+Crew\Unsplash\Search::collections($filters);
 ```
 
 ----
@@ -158,36 +159,44 @@ Retrieve a single page of user results depending on search results.
 
   Argument     | Type   | Opt/Required
 ---------------|--------|--------------
-`$search`      | string | Required
-`$per_page`    | int    | Opt *(Default: 10 / Maximum: 30)*
-`$page`        | int    | Opt *(Default: 1)*
+`$filters`      | array | Required
 
 **Example**
 
 
 ```php
-Crew\Unsplash\Search::users($search, $page, $per_page);
+$filters  = [
+    'query' => 'Some query',
+    'page' => 3,
+    'per_page' => 15,
+];
+
+Crew\Unsplash\Search::users($filters);
 ```
 
 ----
 
 ### Curated Collection
 
-#### Crew\Unsplash\CuratedCollection::all($page, $per_page)
+#### Crew\Unsplash\CuratedCollection::all($filters, $returnArrayObject)
 Retrieve the list of curated collections.
 
 **Arguments**
 
   Argument           | Type | Opt/Required
 ---------------------|------|--------------
-`$per_page`          | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`              | int  | Opt *(Default: 1)*
+`$filters`      | array | Required
 `$returnArrayObject` | bool | Opt *(Default: true)*
 
 **Example**
 
 
 ```php
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+];
+
 Crew\Unsplash\CuratedCollection::all($page, $per_page);
 ```
 
@@ -216,7 +225,7 @@ Crew\Unsplash\CuratedCollection::find(integer $id);
 
 ----
 
-#### Crew\Unsplash\CuratedCollection::photos($page, $per_page)
+#### Crew\Unsplash\CuratedCollection::photos($returnArrayObject)
 Retrieve photos from a curated collection.
 
 *Note:* You need to instantiate a curated collection object first.
@@ -225,81 +234,89 @@ Retrieve photos from a curated collection.
 
   Argument           | Type | Opt/Required
 ---------------------|------|--------------
-`$per_page`          | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`              | int  | Opt *(Default: 1)*
 `$returnArrayObject` | bool | Opt *(Default: true)*
 
 **Example**
 
 ```php
 $collection = Crew\Unsplash\CuratedCollection::find(integer $id);
-$photos = $collection->photos($page, $per_page);
+$photos = $collection->photos();
 ```
 
 **Example for returning PageResult instead of ArrayObject**
 
 ```php
 $collection = Crew\Unsplash\CuratedCollection::find(integer $id);
-$photos = $collection->photos($page, $per_page, false);
+$photos = $collection->photos(false);
 ```
 
 ----
 
 ### Collection
 
-#### Crew\Unsplash\Collection::all($page, $per_page)
+#### Crew\Unsplash\Collection::all($filters, $returnArrayObject)
 Retrieve the list of collections.
 
 **Arguments**
 
   Argument           | Type | Opt/Required
 ---------------------|------|--------------
-`$per_page`          | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`              | int  | Opt *(Default: 1)*
+`$filters`      | array | Required
 `$returnArrayObject` | bool | Opt *(Default: true)*
 
 **Example**
 
 
 ```php
-Crew\Unsplash\Collection::all($page, $per_page);
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+];
+
+
+Crew\Unsplash\Collection::all($filters);
 ```
 
 **Example for returning PageResult instead of ArrayObject**
 
 ```php
-Crew\Unsplash\Collection::all($page, $per_page, false);
+Crew\Unsplash\Collection::all($filters, false);
 ```
 
 ----
 
-#### Crew\Unsplash\Collection::featured($page, $per_page)
+#### Crew\Unsplash\Collection::featured($filters, $returnArrayObject)
 Retrieve list of featured collections.
 
 **Arguments**
 
   Argument           | Type | Opt/Required
 ---------------------|------|--------------
-`$per_page`          | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`              | int  | Opt *(Default: 1)*
+`$filters`      | array | Required
 `$returnArrayObject` | bool | Opt *(Default: true)*
 
 **Example**
 
 
 ```php
-Crew\Unsplash\Collection::featured($page, $per_page);
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+];
+
+
+Crew\Unsplash\Collection::featured($filters);
 ```
 
 **Example for returning PageResult instead of ArrayObject**
 
 ```php
-Crew\Unsplash\Collection::featured($page, $per_page, false);
+Crew\Unsplash\Collection::featured($filters, false);
 ```
 
 ----
 
-#### Crew\Unsplash\Collection::related($page, $per_page)
+#### Crew\Unsplash\Collection::related($returnArrayObject)
 Retrieve list of featured collections.
 
 *Note* You must instantiate a collection first
@@ -344,7 +361,7 @@ Crew\Unsplash\Collection::find(integer $id);
 
 ----
 
-#### Crew\Unsplash\Collection::photos($page, $per_page)
+#### Crew\Unsplash\Collection::photos($filters, $returnArrayObject)
 Retrieve photos from a collection.
 
 *Note:* You need to instantiate a collection object first.
@@ -353,22 +370,31 @@ Retrieve photos from a collection.
 
   Argument           | Type | Opt/Required
 ---------------------|------|--------------
-`$per_page`          | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`              | int  | Opt *(Default: 1)*
+`$filters`      | array | Required
 `$returnArrayObject` | bool | Opt *(Default: true)*
 
 **Example**
 
 ```php
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+];
+
 $collection = Crew\Unsplash\Collection::find(integer $id);
-$photos = $collection->photos($page, $per_page);
+$photos = $collection->photos($filters);
 ```
 
 **Example for returning PageResult instead of ArrayObject**
 
 ```php
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+];
+
 $collection = Crew\Unsplash\Collection::find(integer $id);
-$photos = $collection->photos($page, $per_page, false);
+$photos = $collection->photos($filters, false);
 ```
 
 ----
@@ -481,54 +507,74 @@ $collection->remove(int $photo_id)
 
 <div id="photo-all" />
 
-#### Crew\Unsplash\Photo::all($page, $per_page, $order_by)
+#### Crew\Unsplash\Photo::all($filters, $returnArrayObject)
 Retrieve a list of photos.
 
 **Arguments**
 
   Argument           | Type   | Opt/Required
 ---------------------|--------|--------------
-`$per_page`          | int    | Opt *(Default: 10 / Maximum: 30)*
-`$page`              | int    | Opt *(Default: 1)*
-`$order_by`          | string | Opt *(Default: latest / Available: oldest, popular)*
-`$returnArrayObject` | bool   | Opt *(Default: true)*
+`$filters`      | array | Required
+`$returnArrayObject` | bool | Opt *(Default: true)*
 
 **Example**
 
 ```php
-Crew\Unsplash\Photo::all($page, $per_page, $order_by);
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+    'order_by' => 'latest',
+];
+
+Crew\Unsplash\Photo::all($filters);
 ```
 
 **Example for returning PageResult instead of ArrayObject**
 
 ```php
-Crew\Unsplash\Photo::all($page, $per_page, $order_by, false);
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+    'order_by' => 'latest',
+];
+
+Crew\Unsplash\Photo::all($filters, false);
 ```
 
 
 ----
 
-#### Crew\Unsplash\Photo::curated($page, $per_page, $order_by)
+#### Crew\Unsplash\Photo::curated($filters, $returnArrayObject)
 Retrieve a list of curated photos.
 
 **Arguments**
 
   Argument           | Type   | Opt/Required
 ---------------------|--------|--------------
-`$per_page`          | int    | Opt *(Default: 10 / Maximum: 30)*
-`$page`              | int    | Opt *(Default: 1)*
-`$order_by`          | string | Opt *(Default: latest / Available: oldest, popular)*
-`$returnArrayObject` | bool   | Opt *(Default: true)*
+`$filters`      | array | Required
+`$returnArrayObject` | bool | Opt *(Default: true)*
 
 **Example**
 
 ```php
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+    'order_by' => 'latest',
+];
+
 Crew\Unsplash\Photo::curated($page, $per_page, $order_by);
 ```
 
 **Example for returning PageResult instead of ArrayObject**
 
 ```php
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+    'order_by' => 'latest',
+];
+
 Crew\Unsplash\Photo::curated($page, $per_page, $order_by, false);
 ```
 
@@ -612,21 +658,16 @@ $photo->photographer();
 
 <div id="photo-random" />
 
-#### Crew\Unsplash\Photo::random([featured => $value, username => $value, query => $value, w => $value, h => $value])
+#### Crew\Unsplash\Photo::random($filters)
 Retrieve a random photo from specified filters. For more information regarding filtering, [refer to the Offical documentation](https://unsplash.com/documentation#get-a-random-photo).
 
 *Note:* An array needs to be passed as a parameter.
 
 **Arguments**
 
-
   Argument     | Type | Opt/Required
 ---------------|------|--------------
-featured | boolean | Opt *(Limit selection to featured photos)*
-username | string | Opt *(Limit selection to a single user)*
-query | string | Opt *(Limit selection to photos matching a search term)*
-w | int | Opt *(Image width in pixels)*
-h | int | Opt *(Image height in pixels)*
+`$filters`      | array | Required
 
 
 **Example**
@@ -639,9 +680,8 @@ $filters = [
     'featured' => true,
     'username' => 'andy_brunner',
     'query'    => 'coffee',
-    'w'        => 100,
-    'h'        => 100
 ];
+
 Crew\Unsplash\Photo::random($filters);
 ```
 
@@ -792,7 +832,7 @@ $user = Crew\Unsplash\User::current();
 
 ----
 
-#### Crew\Unsplash\User::photos($page, $per_page, $order_by)
+#### Crew\Unsplash\User::photos($filters)
 Retrieve user's photos.
 
 *Note:* You need to instantiate a user object first
@@ -801,21 +841,25 @@ Retrieve user's photos.
 
   Argument     | Type | Opt/Required
 ---------------|------|--------------
-`$per_page`    | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`        | int  | Opt *(Default: 1)*
-`$order_by` | string | Opt *(Default: latest / Available: oldest, popular)*
+`$filters`      | array | Required
 
 **Example**
 
 ```php
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+    'order_by' => 'latest',
+];
+
 $user = Crew\Unsplash\User::find($username);
-$user->photos($page, $per_page);
+$user->photos($filters);
 ```
 
 ----
 
 
-#### Crew\Unsplash\User::collections($page, $per_page)
+#### Crew\Unsplash\User::collections($filters)
 Retrieve user's collections.
 
 *Note:* You need to instantiate a user object first
@@ -825,19 +869,24 @@ Retrieve user's collections.
 
   Argument     | Type | Opt/Required
 ---------------|------|--------------
-`$per_page`    | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`        | int  | Opt *(Default: 1)*
+`$filters`      | array | Required
 
 **Example**
 
 ```php
+$filters  = [
+    'page' => 3,
+    'per_page' => 15,
+    'order_by' => 'latest',
+];
+
 $user = Crew\Unsplash\User::find($username);
-$user->collections($page, $per_page);
+$user->collections($filters);
 ```
 
 ----
 
-#### Crew\Unsplash\User::likes($page, $per_page, $order_by)
+#### Crew\Unsplash\User::likes($filters)
 Retrieve user's collections.
 
 *Note:* You need to instantiate a user object first
@@ -846,9 +895,7 @@ Retrieve user's collections.
 
   Argument     | Type | Opt/Required
 ---------------|------|--------------
-`$per_page`    | int  | Opt *(Default: 10 / Maximum: 30)*
-`$page`        | int  | Opt *(Default: 1)*
-`$order_by` | string | Opt *(Default: latest / Available: oldest, popular)*
+`$filters`      | array | Required
 
 
 **Example**
@@ -906,4 +953,4 @@ $user->statistics('days', 7);
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/unsplash/unsplash-php. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org/) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/arcasolutions/unsplash-php. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org/) code of conduct.
