@@ -430,7 +430,7 @@ Update a collection on the user's behalf.
 **Arguments**
 
   Argument     | Type    | Opt/Required | Note
----------------|---------|----------------------
+---------------|---------|--------------|-------
 `$parameters`  | array   | Required     | The following keys can be set in the array : `title`, `description`, `private`
 
 **Example**
